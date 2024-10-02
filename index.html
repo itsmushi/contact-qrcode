@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Contact QR Code Generator</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="qr.min.js"></script>
+    <style>
+        #qrcode {
+            margin-top: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-3">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <h1 class="text-center mb-3">Contact QR Code Generator</h1>
+                <form>
+                    <div class="row">
+                        <div class="col-md-4 form-group">
+                            <label for="title">Title:</label>
+                            <select class="form-control" id="title">
+                                <option value="">Select Title</option>
+                                <option value="Dr">Dr</option>
+                                <option value="Mr">Mr</option>
+                                <option value="Mrs">Mrs</option>
+                                <option value="Miss">Miss</option>
+                                <option value="Prof">Prof</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label for="firstName">First Name:</label>
+                            <input type="text" class="form-control" id="firstName" name="firstName">
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label for="middleName">Middle Name:</label>
+                            <input type="text" class="form-control" id="middleName" name="middleName">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 form-group">
+                            <label for="lastName">Last Name:</label>
+                            <input type="text" class="form-control" id="lastName" name="lastName">
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label for="organization">Organization:</label>
+                            <input type="text" class="form-control" id="organization" name="organization">
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label for="orgTitle">Organization Title:</label>
+                            <input type="text" class="form-control" id="orgTitle" name="orgTitle">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 form-group">
+                            <label for="email">Email:</label>
+                            <input type="email" class="form-control" id="email" name="email">
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label for="website">Website:</label>
+                            <input type="url" class="form-control" id="website" name="website">
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label for="workPhone">Work Phone:</label>
+                            <input type="tel" class="form-control" id="workPhone" name="workPhone">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 form-group">
+                            <label for="personalPhone">Personal Phone:</label>
+                            <input type="tel" class="form-control" id="personalPhone" name="personalPhone">
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label for="officeAddress">Office Address:</label>
+                            <input type="text" class="form-control" id="officeAddress" name="officeAddress">
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <button type="button" class="btn btn-primary btn-block mt-4" onclick="generateQRCode()">Generate</button>
+                        </div>
+                    </div>
+                </form>
+                
+                <div class="row justify-content-center mt-2">
+                  <div id="qrcode" class="text-center col-md-6 d-flex justify-content-center align-items-center" style="height: 256px;"></div>
+                  <div class="col-md-6 d-flex justify-content-center align-items-center">
+                      <button style="display: none; width: auto;" class="btn btn-primary" id="downloadBtn" onclick="downloadQRCode()">Download QR Code</button>
+                  </div>
+              </div>
+              
+              
+            </div>
+        </div>
+    </div>
+    <script>
+        function generateQRCode() {
+            var title = document.getElementById('title').value;
+            var firstName = document.getElementById('firstName').value;
+            var middleName = document.getElementById('middleName').value;
+            var lastName = document.getElementById('lastName').value;
+            var organization = document.getElementById('organization').value;
+            var orgTitle = document.getElementById('orgTitle').value;
+            var email = document.getElementById('email').value;
+            var website = document.getElementById('website').value;
+            var workPhone = document.getElementById('workPhone').value;
+            var personalPhone = document.getElementById('personalPhone').value;
+            var officeAddress = document.getElementById('officeAddress').value;
+
+            var contact = {
+                title: title,
+                firstName: firstName,
+                middleName: middleName,
+                lastName: lastName,
+                organization: organization,
+                orgTitle: orgTitle,
+                email: email,
+                website: website,
+                workPhone: workPhone,
+                personalPhone: personalPhone,
+                officeAddress: officeAddress
+            };
+
+            var container = document.getElementById('qrcode');
+            container.innerHTML = ""; // Clear the previously generated QR code
+
+            // Create vCard format text
+            var text = "BEGIN:VCARD\n" +
+                       "VERSION:3.0\n" +
+                       "N:" + contact.lastName + ";" + contact.firstName + ";" + contact.middleName + ";" + contact.title + ";;\n" +
+                       "ORG:" + contact.organization + "\n" +
+                       "TITLE:" + contact.orgTitle + "\n" +
+                       "URL;WORK:" + contact.website + "\n" +
+                       "EMAIL;HOME:" + contact.email + "\n"+
+                       "TEL;WORK;VOICE:" + contact.workPhone + "\n" +
+                       "TEL;HOME;VOICE:" + contact.personalPhone + "\n" +
+                       "ADR;WORK;PREF;ENCODING=QUOTED-PRINTABLE:;;" + contact.officeAddress + "\n" +
+                       "END:VCARD";
+
+            new QRCode(container, {
+                text: text,
+                width: 256,
+                height: 256,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            document.getElementById('qrcode').style.display = 'block';
+            document.getElementById('downloadBtn').style.display = 'block'; // Show the download button
+        }
+
+        function downloadQRCode() {
+            var Name = document.getElementById('firstName').value;
+
+            var canvas = document.querySelector('#qrcode canvas');
+            if (canvas) {
+                var link = document.createElement('a');
+                link.href = canvas.toDataURL('image/png');
+                link.download = Name + 'qr-contact.png';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+    </script>
+</body>
+</html>
